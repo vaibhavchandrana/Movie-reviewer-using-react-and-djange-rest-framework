@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    background-color: black;
+    color: white;
+}
+.card{
+    background-color: rgb(42, 39, 34);
+}
+.imgsize{
+    height:80vh;
+}
+#rating{
+    color: brown;
+}

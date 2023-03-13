@@ -22,8 +22,10 @@ const AddMovie = () => {
     const addMovie = async () => {
         {
             var error=true;
+            var token=localStorage.getItem('token')
             try {
-                if (localStorage.getItem('token')) {
+                if (token) 
+                {
                     setLoading(true);
                     console.log(form)
                     await axios.post('https://imdb.up.railway.app/api/movielist/', form)

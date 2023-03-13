@@ -24,11 +24,7 @@ const AddMovie = () => {
             var error=true;
             var token=localStorage.getItem('token')
             try {
-                if(!token) {
-                    window.alert("please login");
-                    navigate('/login')
-                }
-                else
+                if (token) 
                 {
                     setLoading(true);
                     console.log(form)
@@ -66,7 +62,10 @@ const AddMovie = () => {
                         }
                     
                 }
-                
+                else {
+                    window.alert("please login");
+                    navigate('/login')
+                }
             }
             catch (err) {
                 swal({

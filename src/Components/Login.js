@@ -1,48 +1,44 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { Link, useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import axios from "axios";
-
+import { backendUrl } from "../backendUrl";
 const Login = () => {
-
+  const url = backendUrl();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     username: "",
-    password: ""
+    password: "",
   });
   const [loading, setLoading] = useState(false);
 
-  async function login ()
-  {
-    var error=true
+  async function login() {
+    var error = true;
     setLoading(true);
-   await axios.post('https://imdb.up.railway.app/user/login/', form)
-      .then(res => {
-        
-        if (res.status == 200) 
-        {
-          error=false;
-          swal({
-            text: "Sucessfully Login",
-            icon: "success",
-            buttons: false,
-            timer: 3000,
-          });
-          const { token } = res.data;
-          localStorage.setItem('token', token);
-          navigate('/')
-        }
-      })
-      if(error== true){
+    await axios.post(`${url}/user/login/`, form).then((res) => {
+      if (res.status == 200) {
+        error = false;
         swal({
-          text: "invalid credentials",
-          icon: "error",
+          text: "Sucessfully Login",
+          icon: "success",
           buttons: false,
           timer: 3000,
         });
+        const { token } = res.data;
+        localStorage.setItem("token", token);
+        navigate("/");
       }
-      
+    });
+    if (error == true) {
+      swal({
+        text: "invalid credentials",
+        icon: "error",
+        buttons: false,
+        timer: 3000,
+      });
+    }
+
     setLoading(false);
   }
   return (
@@ -87,7 +83,12 @@ const Login = () => {
         </button>
       </div>
       <div>
-        <p>Do not have account? <Link to={'/signup'}><span className="text-blue-500">Sign Up</span></Link></p>
+        <p>
+          Do not have account?{" "}
+          <Link to={"/signup"}>
+            <span className="text-blue-500">Sign Up</span>
+          </Link>
+        </p>
       </div>
     </div>
   );

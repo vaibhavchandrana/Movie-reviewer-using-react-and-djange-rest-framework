@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import swal from "sweetalert";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import { backendUrl } from "../backendUrl";
 const Signup = () => {
-
+  const url = backendUrl();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     first_name: "",
@@ -14,18 +14,18 @@ const Signup = () => {
     email: "",
     password: "",
     password2: "",
-    username: ""
+    username: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("")
+  const [error, setError] = useState("");
 
   const register = async () => {
-
     setLoading(true);
-    await axios.post('https://imdb.up.railway.app/user/registration/', form)
-      .then(res => {
-        const {response}=res.data
-        if (response=== "registration Successful") {
+    await axios
+      .post(`${url}/user/registration/`, form)
+      .then((res) => {
+        const { response } = res.data;
+        if (response === "registration Successful") {
           swal({
             text: "Sucessfully Registered",
             icon: "success",
@@ -33,24 +33,22 @@ const Signup = () => {
             timer: 3000,
           });
           const { token } = res.data;
-          localStorage.setItem('token', token);
+          localStorage.setItem("token", token);
           setLoading(false);
-          navigate('/')
+          navigate("/");
         }
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error.response.data.Error);
-        setError(error.response.data.Error); 
+        setError(error.response.data.Error);
         setLoading(false);
       });
-      
-
-  }
+  };
 
   return (
     <div className="w-full flex flex-col mt-8 items-center">
       <h1 className="text-xl font-bold">Sign up</h1>
-      <br/>
+      <br />
       <span className="text-lg text-blue-500 font-bold">{error}</span>
       <div class="p-2 w-full md:w-1/3">
         <div className="flex">
@@ -59,7 +57,7 @@ const Signup = () => {
               First Name
             </label>
             <input
-              id="message"
+              id="first_name"
               name="message"
               value={form.first_name}
               onChange={(e) => setForm({ ...form, first_name: e.target.value })}
@@ -71,7 +69,7 @@ const Signup = () => {
               Last Name
             </label>
             <input
-              id="message"
+              id="second_name"
               name="message"
               value={form.last_name}
               onChange={(e) => setForm({ ...form, last_name: e.target.value })}
@@ -87,10 +85,16 @@ const Signup = () => {
           </label>
           <input
             type={"email"}
-            id="message"
+            id="email"
             name="message"
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value, username: e.target.value })}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                email: e.target.value,
+                username: e.target.value,
+              })
+            }
             class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
           />
         </div>
@@ -101,8 +105,8 @@ const Signup = () => {
             Password
           </label>
           <input
-            type={'password'}
-            id="message"
+            type={"password"}
+            id="password"
             name="message"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -114,8 +118,8 @@ const Signup = () => {
             Confirm Password
           </label>
           <input
-            type={'password'}
-            id="message"
+            type={"password"}
+            id="con_message"
             name="message"
             value={form.password2}
             onChange={(e) => setForm({ ...form, password2: e.target.value })}
@@ -133,7 +137,12 @@ const Signup = () => {
       </div>
 
       <div>
-        <p>Already have an account <Link to={'/login'}><span className="text-blue-500">Login</span></Link></p>
+        <p>
+          Already have an account{" "}
+          <Link to={"/login"}>
+            <span className="text-blue-500">Login</span>
+          </Link>
+        </p>
       </div>
       <div id="recaptcha-container"></div>
     </div>

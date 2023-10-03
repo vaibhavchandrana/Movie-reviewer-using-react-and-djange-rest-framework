@@ -1,113 +1,96 @@
-import React, {useEffect, useState } from 'react'
-import ReactStars from 'react-stars'
-import { TailSpin, ThreeDots } from 'react-loader-spinner'
-import swal from 'sweetalert'
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import ReactStars from "react-stars";
+import { TailSpin, ThreeDots } from "react-loader-spinner";
+import swal from "sweetalert";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { backendUrl } from "../backendUrl";
 
 const Reviews = ({ id }) => {
-
+  const url = backendUrl();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [reviewLoading, setReviewLoading] = useState(false)
+  const [reviewLoading, setReviewLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [newAdded, setNewAdded] = useState(0)
+  const [newAdded, setNewAdded] = useState(0);
   const [form, setForm] = useState({
     rating: 0,
-    comment: ""
+    comment: "",
   });
-
-
 
   const sendReview = async () => {
     setLoading(true);
     setData([]);
-    var error=true
-    var token=localStorage.getItem('token')
+    var error = true;
+    var token = localStorage.getItem("token");
     try {
-      if (token) 
-      {
-       await axios.post(`https://imdb.up.railway.app/api/${id}/review-create/`,form,{
-          headers: {
-            'Authorization': `Token ${token}` 
-          }
-        })
-         .then(res => {
-            
-        if (res.status == 201) 
-        {
-          error=false;
+      if (token) {
+        await axios
+          .post(`${url}/api/${id}/review-create/`, form, {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          })
+          .then((res) => {
+            if (res.status == 201) {
+              error = false;
+              swal({
+                text: "Review Added Succesfully",
+                icon: "success",
+                buttons: false,
+                timer: 3000,
+              });
+              setNewAdded(newAdded + 1);
+            }
+          })
+          .catch(function (error) {
+            console.log("Show error notification!");
+            return Promise.reject(error);
+          })
+          .catch(function (error) {
+            console.log(error.response.data.Error);
+            // setError(error.response.data.Error);
+            setLoading(false);
+          });
+
+        if (error == true) {
           swal({
-            text: "Review Added Succesfully",
-            icon: "success",
+            text: "You have reviewed already",
+            icon: "error",
             buttons: false,
             timer: 3000,
           });
-          setNewAdded(newAdded+1);
+          setNewAdded(newAdded + 1);
         }
-      })
-      .catch(
-        function (error) {
-          console.log('Show error notification!')
-          return Promise.reject(error)
-        }
-      )
-      .catch(function(error) {
-        console.log(error.response.data.Error);
-        // setError(error.response.data.Error); 
-        setLoading(false);
-      });
-    
-      if(error==true)
-      {
-        swal({
-          text: "You have reviewed already",
-          icon: "error",
-          buttons: false,
-          timer: 3000,
-        });
-        setNewAdded(newAdded+1)
+      } else {
+        window.alert("please login");
+        navigate("/login");
       }
-    }
-    else 
-    {
-      window.alert("please login");
-      navigate('/login')  
-    }
-    }
-    catch (err) {
+    } catch (err) {
       swal({
         title: err,
         icon: "error",
         button: false,
-        timer: 5000
-
-      })
-
+        timer: 5000,
+      });
     }
     setLoading(false);
-
-  }
-
+  };
 
   useEffect(() => {
     async function getData() {
       setReviewLoading(true);
-      axios.get(`https://imdb.up.railway.app/api/${id}/review/`)
-                .then(res => {
-                    const mydata = res.data;
-                    setData(mydata)
-                })
+      axios.get(`${url}/v2/review_data/${id}/`).then((res) => {
+        const mydata = res.data;
+        setData(mydata);
+      });
       setReviewLoading(false);
     }
     getData();
-  }, [newAdded])
+  }, [newAdded]);
 
-
-  
   return (
-    <div className='mt-2 py-2 border-t-2 border-gray-700 w-full'>
+    <div className="mt-2 py-2 border-t-2 border-gray-700 w-full">
       <ReactStars
         size={30}
         half={true}
@@ -121,34 +104,39 @@ const Reviews = ({ id }) => {
         type="text"
         className="w-full p-2 outline-none bg-gray-600 "
       />
-      <button onClick={sendReview} className='bg-red-500 w-full p-1'>
-        {loading ? <div className='flex justify-center items-center'><TailSpin height={15} color="white" /> </div> : 'Share'}
+      <button onClick={sendReview} className="bg-red-500 w-full p-1">
+        {loading ? (
+          <div className="flex justify-center items-center">
+            <TailSpin height={15} color="white" />{" "}
+          </div>
+        ) : (
+          "Share"
+        )}
       </button>
-      {reviewLoading ?
-        <div className="mt-6 flex justify-center item-center"><ThreeDots height={20} color="red" /></div> :
-        <div>{
-          data.map((e, i) => {
+      {reviewLoading ? (
+        <div className="mt-6 flex justify-center item-center">
+          <ThreeDots height={20} color="red" />
+        </div>
+      ) : (
+        <div>
+          {data.map((e, i) => {
             return (
-              <div className='p-2 w-full mt-2  border-b border-red-600' key={i}>
-                <div className='flex'>
-                  <p className='text-red-500 '>{e.review_user}</p>
-                  <p className='ml-3 text-xs'>({new Date(e.update).toLocaleString()})</p>
+              <div className="p-2 w-full mt-2  border-b border-red-600" key={i}>
+                <div className="flex">
+                  <p className="text-red-500 ">{e.name}</p>
+                  <p className="ml-3 text-xs">
+                    ({new Date(e.created_at).toLocaleString()})
+                  </p>
                 </div>
-                <ReactStars
-                  size={20}
-                  half={true}
-                  value={e.rating}
-                  edit={false}
-                />
-                <p>{e.comment}</p>
+                <ReactStars size={20} half={true} value={5} edit={false} />
+                <p>{e.review_data}</p>
               </div>
-            )
+            );
           })}
         </div>
-
-      }
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Reviews
+export default Reviews;

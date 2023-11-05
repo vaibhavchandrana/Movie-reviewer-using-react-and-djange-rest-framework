@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+.share-movie-modal {
+  width: 500px;
+}
+.delete-button-over-image {
+  position: absolute;
+  right: 10px;
+  top: 20px;
+}
